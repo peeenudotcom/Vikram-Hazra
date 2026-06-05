@@ -6,7 +6,28 @@
 import { useState, useEffect, FormEvent } from "react";
 import { Language, CityTour } from "../types";
 import { TRANSLATIONS, TOUR_CITIES } from "../translations";
-import { Share2, Check, Copy, ArrowRight, User, Phone, MapPin, Users, Ticket, MessageSquare, Flame } from "lucide-react";
+import { Share2, Check, Copy, ArrowRight, User, Phone, MapPin, Users, Ticket, MessageSquare, Flame, AlertCircle, Loader2 } from "lucide-react";
+
+// ─────────────────────────────────────────────────────────────
+// GOOGLE SHEETS BACKEND CONFIG
+// Step 1: Create a new Google Sheet
+// Step 2: Go to Extensions → Apps Script and paste the script
+//         from /google-apps-script/Code.gs in this repo
+// Step 3: Deploy as Web App (Execute as: Me, Who has access: Anyone)
+// Step 4: Replace the URL below with your deployed Web App URL
+// ─────────────────────────────────────────────────────────────
+const GOOGLE_SHEETS_WEBAPP_URL =
+  "https://script.google.com/macros/s/YOUR_WEBAPP_ID_HERE/exec";
+
+const IS_SHEETS_CONNECTED =
+  GOOGLE_SHEETS_WEBAPP_URL.includes("YOUR_WEBAPP_ID_HERE") === false;
+
+// Phone validation — accepts Indian mobile numbers
+// Supports: 98765-43210 / +91-98765-43210 / 09876543210 / 9876543210
+const isValidIndianPhone = (phone: string): boolean => {
+  const cleaned = phone.replace(/[\s\-()]/g, "");
+  return /^(\+91|0091|0)?[6-9]\d{9}$/.test(cleaned);
+};
 
 interface RegisterFormProps {
   language: Language;
@@ -44,6 +65,8 @@ export function RegisterForm({
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
   const [registrationPass, setRegistrationPass] = useState<{
     id: string;
     cityNameEN: string;
@@ -64,24 +87,103 @@ export function RegisterForm({
 
   const [copiedGlobal, setCopiedGlobal] = useState(false);
 
-  // Fetch local mock registration on mount if desired, but user starts fresh
   const t = (key: keyof typeof TRANSLATIONS) => TRANSLATIONS[key][language];
 
-  const handleRegister = (e: FormEvent) => {
+  // ── Validation helpers ──────────────────────────────────────
+  const validatePhone = (value: string) => {
+    if (!value) {
+      setPhoneError(
+        language === "pb" ? "ਮੋਬਾਈਲ ਨੰਬਰ ਲਾਜ਼ਮੀ ਹੈ।"
+        : language === "hi" ? "मोबाइल नंबर आवश्यक है।"
+        : "Mobile number is required."
+      );
+    } else if (!isValidIndianPhone(value)) {
+      setPhoneError(
+        language === "pb" ? "ਕਿਰਪਾ ਕਰਕੇ ਸਹੀ ਭਾਰਤੀ ਮੋਬਾਈਲ ਨੰਬਰ ਦਰਜ ਕਰੋ। (ਜਿਵੇਂ: 98765 43210)"
+        : language === "hi" ? "कृपया सही भारतीय मोबाइल नंबर दर्ज करें। (जैसे: 98765 43210)"
+        : "Please enter a valid Indian mobile number. (e.g. 98765 43210)"
+      );
+    } else {
+      setPhoneError(null);
+    }
+  };
+
+  // ── Google Sheets submission ────────────────────────────────
+  const submitToGoogleSheets = async (payload: Record<string, string>) => {
+    const formBody = new URLSearchParams(payload).toString();
+    const response = await fetch(GOOGLE_SHEETS_WEBAPP_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: formBody,
+    });
+    if (!response.ok) {
+      throw new Error(`Server responded with status ${response.status}`);
+    }
+    const result = await response.json();
+    if (result.status !== "success") {
+      throw new Error(result.message || "Unknown error from server.");
+    }
+    return result;
+  };
+
+  // ── Pass ID generator — deterministic from name+city+timestamp ──
+  const generatePassId = (cityCode: string): string => {
+    const ts = Date.now().toString(36).toUpperCase().slice(-4);
+    return `VH26-${cityCode.toUpperCase()}-${ts}`;
+  };
+
+  // ── Form submit handler ─────────────────────────────────────
+  const handleRegister = async (e: FormEvent) => {
     e.preventDefault();
-    if (!formData.fullName || !formData.mobile || !formData.village) {
-      alert(language === "pb" ? "ਕਿਰਪਾ ਕਰਕੇ ਸਾਰੇ ਖੇਤਰ ਭਰੋ।" : language === "hi" ? "कृपया सभी क्षेत्रों को भरें।" : "Please fill out all fields.");
+    setSubmitError(null);
+
+    // Client-side validation
+    if (!formData.fullName.trim() || !formData.mobile.trim() || !formData.village.trim()) {
+      setSubmitError(
+        language === "pb" ? "ਕਿਰਪਾ ਕਰਕੇ ਸਾਰੇ ਖੇਤਰ ਭਰੋ।"
+        : language === "hi" ? "कृपया सभी क्षेत्रों को भरें।"
+        : "Please fill out all required fields."
+      );
+      return;
+    }
+    if (!isValidIndianPhone(formData.mobile)) {
+      validatePhone(formData.mobile);
       return;
     }
 
     setIsLoading(true);
-    
-    // Simulate API registration delay
-    setTimeout(() => {
-      const activeCity = TOUR_CITIES.find((c) => c.id === activeTab) || TOUR_CITIES[0];
-      const passId = `VH26-${activeCity.id.substring(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
-      const newPass = {
+    const activeCity = TOUR_CITIES.find((c) => c.id === activeTab) || TOUR_CITIES[0];
+    const passId = generatePassId(activeCity.id.substring(0, 3));
+
+    const payload: Record<string, string> = {
+      passId,
+      city: activeCity.cityNameEN,
+      date: activeCity.dateStrEN,
+      venue: activeCity.venueEN,
+      fullName: formData.fullName.trim(),
+      mobile: formData.mobile.trim(),
+      village: formData.village.trim(),
+      attendees: formData.attendees,
+      language,
+      submittedAt: new Date().toISOString(),
+    };
+
+    try {
+      if (IS_SHEETS_CONNECTED) {
+        // Real Google Sheets submission
+        await submitToGoogleSheets(payload);
+      } else {
+        // Fallback: simulate 1s delay when not yet connected
+        await new Promise((res) => setTimeout(res, 1000));
+        console.warn(
+          "[RegisterForm] Google Sheets not connected. " +
+          "Set GOOGLE_SHEETS_WEBAPP_URL in RegisterForm.tsx. " +
+          "Registration was NOT saved to any database."
+        );
+      }
+
+      setRegistrationPass({
         id: passId,
         cityNameEN: activeCity.cityNameEN,
         cityNamePB: activeCity.cityNamePB,
@@ -93,15 +195,23 @@ export function RegisterForm({
         venuePB: activeCity.venuePB,
         venueHI: activeCity.venueHI,
         time: activeCity.timeEN,
-        name: formData.fullName,
-        phone: formData.mobile,
-        village: formData.village,
-        count: formData.attendees
-      };
-
-      setRegistrationPass(newPass);
+        name: formData.fullName.trim(),
+        phone: formData.mobile.trim(),
+        village: formData.village.trim(),
+        count: formData.attendees,
+      });
+    } catch (err) {
+      console.error("[RegisterForm] Submission failed:", err);
+      setSubmitError(
+        language === "pb"
+          ? "ਰਜਿਸਟ੍ਰੇਸ਼ਨ ਸਮੇਂ ਕੋਈ ਸਮੱਸਿਆ ਆਈ। ਕਿਰਪਾ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।"
+          : language === "hi"
+          ? "पंजीकरण के दौरान कोई समस्या आई। कृपया पुनः प्रयास करें।"
+          : "Registration failed. Please try again or contact the organizer."
+      );
+    } finally {
       setIsLoading(false);
-    }, 1200);
+    }
   };
 
   // Pre-filled WhatsApp Share logic
@@ -371,9 +481,23 @@ export function RegisterForm({
                       required
                       placeholder="e.g. +91 98765-43210"
                       value={formData.mobile}
-                      onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
-                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm text-[#FDF6EC] placeholder-[#FDF6EC]/30 h-11.5 outline-none focus:border-[#D4AF37] focus:bg-[#1A1A2E] transition-all"
+                      onChange={(e) => {
+                        setFormData({ ...formData, mobile: e.target.value });
+                        if (phoneError) validatePhone(e.target.value);
+                      }}
+                      onBlur={(e) => validatePhone(e.target.value)}
+                      className={`w-full rounded-xl border bg-white/5 px-4 py-3.5 text-sm text-[#FDF6EC] placeholder-[#FDF6EC]/30 h-11.5 outline-none transition-all ${
+                        phoneError
+                          ? "border-red-400/70 focus:border-red-400"
+                          : "border-white/10 focus:border-[#D4AF37] focus:bg-[#1A1A2E]"
+                      }`}
                     />
+                    {phoneError && (
+                      <p className="flex items-center gap-1 text-[11px] text-red-400 font-sans mt-1">
+                        <AlertCircle className="h-3 w-3 shrink-0" />
+                        {phoneError}
+                      </p>
+                    )}
                   </div>
 
                   {/* City/Village field */}
@@ -420,17 +544,41 @@ export function RegisterForm({
 
                 </div>
 
+                {/* Submit error message */}
+                {submitError && (
+                  <div className="flex items-start gap-2.5 rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-xs text-red-300">
+                    <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                    <span>{submitError}</span>
+                  </div>
+                )}
+
+                {/* Sheets not connected warning (dev mode) */}
+                {!IS_SHEETS_CONNECTED && (
+                  <div className="flex items-start gap-2.5 rounded-xl border border-yellow-400/30 bg-yellow-400/10 px-4 py-3 text-[11px] text-yellow-300">
+                    <AlertCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                    <span>
+                      <strong>Dev mode:</strong> Google Sheets not connected.
+                      Registrations will NOT be saved. See <code>RegisterForm.tsx</code> for setup instructions.
+                    </span>
+                  </div>
+                )}
+
                 {/* Submission CTA */}
-                <div className="pt-4 text-center">
+                <div className="pt-2 text-center">
                   <button
                     id="form-register-cta"
                     type="submit"
-                    disabled={isLoading}
-                    className="cursor-pointer w-full group relative overflow-hidden rounded-full bg-gradient-to-r from-[#FF6B35] to-[#D4AF37] px-8 py-4 text-sm font-bold tracking-widest text-[#FDF6EC] shadow-md shadow-[#FF6B35]/25 outline-none transition duration-300 hover:scale-103 active:scale-97 disabled:opacity-50"
+                    disabled={isLoading || !!phoneError}
+                    className="cursor-pointer w-full group relative overflow-hidden rounded-full bg-gradient-to-r from-[#FF6B35] to-[#D4AF37] px-8 py-4 text-sm font-bold tracking-widest text-[#FDF6EC] shadow-md shadow-[#FF6B35]/25 outline-none transition duration-300 hover:scale-103 active:scale-97 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <span>{isLoading ? "Generating Your Invitation..." : t("formSubmit")}</span>
+                    <span className="flex items-center justify-center gap-2">
+                      {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                      {isLoading
+                        ? (language === "pb" ? "ਪਾਸ ਤਿਆਰ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ..." : language === "hi" ? "पास तैयार किया जा रहा है..." : "Generating Your Pass...")
+                        : t("formSubmit")}
+                    </span>
                   </button>
-                  
+
                   <span className="inline-block mt-3 font-mono text-[10px] text-[#FDF6EC]/40 uppercase tracking-widest leading-none">
                     ⭐ ADMISSION PASS IS COMPLETELY FREE OF COST • SPONSORED BY THE ART OF LIVING
                   </span>

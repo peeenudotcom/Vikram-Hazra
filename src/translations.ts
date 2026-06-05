@@ -11,9 +11,9 @@ export const TOUR_CITIES: CityTour[] = [
     cityNameEN: "Bathinda",
     cityNamePB: "ਬਠਿੰਡਾ",
     cityNameHI: "बठिंडा",
-    dateStrEN: "30th July, Wednesday",
-    dateStrPB: "30 ਜੁਲਾਈ, ਬੁੱਧਵਾਰ",
-    dateStrHI: "30 जुलाई, बुधवार",
+    dateStrEN: "30th July, Thursday",
+    dateStrPB: "30 ਜੁਲਾਈ, ਵੀਰਵਾਰ",
+    dateStrHI: "30 जुलाई, गुरुवार",
     dateISO: "2026-07-30T18:30:00+05:30",
     venueEN: "Bathinda City Grounds, Punjab",
     venuePB: "ਬਠਿੰਡਾ ਸਿਟੀ ਗਰਾਊਂਡ, ਪੰਜਾਬ",
@@ -22,7 +22,7 @@ export const TOUR_CITIES: CityTour[] = [
     timePB: "ਸ਼ਾਮ 6:30 ਵਜੇ ਤੋਂ",
     timeHI: "शाम 6:30 बजे से",
     mapLink: "https://maps.google.com/?q=Bathinda+Punjab",
-    whatsappMessage: "🙏 ਜੈ ਗੁਰੂਦੇਵ! Vikram Hazra Live Satsang 🎵\n📅 30th July 2026 (Wednesday)\n📍 Bathinda, Punjab\n🕕 6:30 PM Onwards | 🎟️ FREE Entry\nOrganized by Art of Living\nRegister & Info: [LINK]\nਆਓ ਤੇ ਪਰਿਵਾਰ ਨੂੰ ਵੀ ਲੈ ਕੇ ਆਓ 🙏"
+    whatsappMessage: "🙏 ਜੈ ਗੁਰੂਦੇਵ! Vikram Hazra Live Satsang 🎵\n📅 30th July 2026 (Thursday)\n📍 Bathinda, Punjab\n🕕 6:30 PM Onwards | 🎟️ FREE Entry\nOrganized by Art of Living\nRegister & Info: [LINK]\nਆਓ ਤੇ ਪਰਿਵਾਰ ਨੂੰ ਵੀ ਲੈ ਕੇ ਆਓ 🙏"
   },
   {
     id: "faridkot",
@@ -40,7 +40,7 @@ export const TOUR_CITIES: CityTour[] = [
     timePB: "ਸ਼ਾਮ 6:30 ਵਜੇ ਤੋਂ",
     timeHI: "शाम 6:30 बजे से",
     mapLink: "https://maps.google.com/?q=Radha+Krishna+Dham+Faridkot+Punjab",
-    whatsappMessage: "🙏 ਜੈ ਗੁਰੂਦੇਵ! Vikram Hazra Live Satsang 🎵\n📅 31st July 2026 (Thursday)\n📍 Radha Krishna Dham, Faridkot, Punjab\n🕕 6:30 PM Onwards | 🎟️ FREE Entry\nOrganized by Art of Living\nRegister & Info: [LINK]\nਆਓ ਤੇ ਪਰਿਵਾਰ ਨੂੰ ਵੀ ਲੈ ਕੇ ਆਓ 🙏"
+    whatsappMessage: "🙏 ਜੈ ਗੁਰੂਦੇਵ! Vikram Hazra Live Satsang 🎵\n📅 31st July 2026 (Friday)\n📍 Radha Krishna Dham, Faridkot, Punjab\n🕕 6:30 PM Onwards | 🎟️ FREE Entry\nOrganized by Art of Living\nRegister & Info: [LINK]\nਆਓ ਤੇ ਪਰਿਵਾਰ ਨੂੰ ਵੀ ਲੈ ਕੇ ਆਓ 🙏"
   },
   {
     id: "nangal",
@@ -58,7 +58,7 @@ export const TOUR_CITIES: CityTour[] = [
     timePB: "ਸ਼ਾਮ 6:30 ਵਜੇ ਤੋਂ",
     timeHI: "शाम 6:30 बजे से",
     mapLink: "https://maps.google.com/?q=Nangal+Punjab",
-    whatsappMessage: "🙏 ਜੈ ਗੁਰੂਦੇਵ! Vikram Hazra Live Satsang 🎵\n📅 1st August 2026 (Friday)\n📍 Nangal, Punjab\n🕕 6:30 PM Onwards | 🎟️ FREE Entry\nOrganized by Art of Living\nRegister & Info: [LINK]\nਆਓ ਤੇ ਪਰਿਵਾਰ ਨੂੰ ਵੀ ਲੈ ਕੇ ਆਓ 🙏"
+    whatsappMessage: "🙏 ਜੈ ਗੁਰੂਦੇਵ! Vikram Hazra Live Satsang 🎵\n📅 1st August 2026 (Saturday)\n📍 Nangal, Punjab\n🕕 6:30 PM Onwards | 🎟️ FREE Entry\nOrganized by Art of Living\nRegister & Info: [LINK]\nਆਓ ਤੇ ਪਰਿਵਾਰ ਨੂੰ ਵੀ ਲੈ ਕੇ ਆਓ 🙏"
   },
   {
     id: "jalalabad",
@@ -76,7 +76,7 @@ export const TOUR_CITIES: CityTour[] = [
     timePB: "ਸ਼ਾਮ 6:30 ਵਜੇ ਤੋਂ",
     timeHI: "शाम 6:30 बजे से",
     mapLink: "https://maps.google.com/?q=Jalalabad+Punjab",
-    whatsappMessage: "🙏 ਜੈ ਗੁਰੂਦੇਵ! Vikram Hazra Live Satsang 🎵\n📅 2nd August 2026 (Saturday)\n📍 Jalalabad, Punjab\n🕕 6:30 PM Onwards | 🎟️ FREE Entry\nOrganized by Art of Living\nRegister & Info: [LINK]\nਆਓ ਤੇ ਪਰਿਵਾਰ ਨੂੰ ਵੀ ਲੈ ਕੇ ਆਓ 🙏"
+    whatsappMessage: "🙏 ਜੈ ਗੁਰੂਦੇਵ! Vikram Hazra Live Satsang 🎵\n📅 2nd August 2026 (Sunday)\n📍 Jalalabad, Punjab\n🕕 6:30 PM Onwards | 🎟️ FREE Entry\nOrganized by Art of Living\nRegister & Info: [LINK]\nਆਓ ਤੇ ਪਰਿਵਾਰ ਨੂੰ ਵੀ ਲੈ ਕੇ ਆਓ 🙏"
   }
 ];
 
