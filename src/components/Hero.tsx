@@ -97,8 +97,8 @@ export function Hero({
 
         {/* YouTube Video Background */}
         <iframe
-          src="https://www.youtube.com/embed/LqKIsjbeHxk?autoplay=1&mute=1&loop=1&playlist=LqKIsjbeHxk&controls=0&showinfo=0&rel=0&iv_load_policy=3&playsinline=1&modestbranding=1&enablejsapi=1"
-          title="Vikram Hazra Background Video"
+          src="https://www.youtube-nocookie.com/embed/rS-jOoGyDWY?autoplay=1&mute=1&loop=1&playlist=rS-jOoGyDWY&controls=0&showinfo=0&rel=0&iv_load_policy=3&playsinline=1&modestbranding=1&enablejsapi=1"
+          title="Vikram Hazra - Blissful Krishna Bhajans"
           onLoad={() => setVideoLoaded(true)}
           className={`absolute top-1/2 left-1/2 h-[56.25vw] min-h-full w-[177.78vh] min-w-full -translate-x-1/2 -translate-y-1/2 pointer-events-none transition-opacity duration-1000 ${
             videoLoaded ? "opacity-45" : "opacity-0"
