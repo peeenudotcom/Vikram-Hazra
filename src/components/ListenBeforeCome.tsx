@@ -3,15 +3,27 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { useState } from "react";
 import { Language } from "../types";
 import { TRANSLATIONS } from "../translations";
 import { Play, Sparkles, Star, Disc, Apple, Music } from "lucide-react";
+
+// ─────────────────────────────────────────────────────────────
+// YouTube Facade Pattern
+// Shows a thumbnail + play button. On click, replaces with an
+// iframe with autoplay=1 — Chrome allows autoplay with sound
+// because it's triggered by a user gesture (click).
+// This avoids domain-restriction errors and loads faster.
+// ─────────────────────────────────────────────────────────────
+const VIDEO_ID  = "n_kq_EtwVGI";  // Om Namah Shivaya | Vikram Hazra | Art of Living
+const THUMB_URL = `https://img.youtube.com/vi/${VIDEO_ID}/hqdefault.jpg`;
 
 interface ListenBeforeComeProps {
   language: Language;
 }
 
 export function ListenBeforeCome({ language }: ListenBeforeComeProps) {
+  const [playing, setPlaying] = useState(false);
   const t = (key: keyof typeof TRANSLATIONS) => TRANSLATIONS[key][language];
 
   const streamingLinks = [
@@ -41,25 +53,69 @@ export function ListenBeforeCome({ language }: ListenBeforeComeProps) {
       className="relative z-10 w-full bg-gradient-to-b from-[#1A1A2E] to-[#121222] py-24 px-4 sm:px-6 lg:px-8"
     >
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        
-        {/* Left Side: Video Player Embed */}
+
+        {/* Left Side: YouTube Facade → iframe on click */}
         <div className="lg:col-span-7 flex flex-col justify-center">
           <div className="relative w-full aspect-video rounded-3xl overflow-hidden shadow-2xl border border-white/10 gold-glow-box bg-[#0A0A16]">
-            {/* The YouTube iframe embed with actual controls */}
-            <iframe
-              width="100%"
-              height="100%"
-              src="https://www.youtube-nocookie.com/embed/chHkGBIdnoU?controls=1&rel=0&modestbranding=1"
-              title="Vikram Hazra - Achyutam Keshavam Krishna Damodaram | Art of Living"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="absolute inset-0"
-              referrerPolicy="no-referrer"
-            />
+
+            {playing ? (
+              /* ── Active player ─────────────────────────────── */
+              <iframe
+                key="yt-player"
+                width="100%"
+                height="100%"
+                src={`https://www.youtube.com/embed/${VIDEO_ID}?autoplay=1&rel=0&modestbranding=1`}
+                title="Vikram Hazra - Om Namah Shivaya | Art of Living Bhajan"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                className="absolute inset-0 w-full h-full"
+              />
+            ) : (
+              /* ── Thumbnail facade ──────────────────────────── */
+              <button
+                type="button"
+                onClick={() => setPlaying(true)}
+                className="absolute inset-0 w-full h-full group cursor-pointer focus:outline-none"
+                aria-label="Play Vikram Hazra - Om Namah Shivaya"
+              >
+                {/* Thumbnail image */}
+                <img
+                  src={THUMB_URL}
+                  alt="Vikram Hazra - Om Namah Shivaya | Art of Living"
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+
+                {/* Dark gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+
+                {/* Play button circle */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="relative flex items-center justify-center">
+                    {/* Outer pulse ring */}
+                    <div className="absolute h-24 w-24 rounded-full bg-[#FF6B35]/30 animate-ping" />
+                    {/* Inner button */}
+                    <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-[#FF6B35] shadow-2xl shadow-[#FF6B35]/50 transition-transform duration-200 group-hover:scale-110">
+                      <Play className="h-8 w-8 fill-white text-white ml-1" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Track label at bottom */}
+                <div className="absolute bottom-4 left-4 right-4 text-left">
+                  <p className="text-[10px] font-semibold tracking-widest text-white/60 uppercase">
+                    {language === "pb" ? "ਕਲਿੱਕ ਕਰਕੇ ਸੁਣੋ" : language === "hi" ? "क्लिक करके सुनें" : "Click to play"}
+                  </p>
+                  <p className="font-serif text-sm font-bold text-white mt-0.5">
+                    Om Namah Shivaya — Vikram Hazra | Art of Living
+                  </p>
+                </div>
+              </button>
+            )}
           </div>
 
           <div className="mt-4 flex items-center justify-between px-3 text-xs text-[#FDF6EC]/60 font-mono">
-            <span>📺 Live Recording Performance</span>
+            <span>📺 {playing ? "Now Playing" : "Live Recording Performance"}</span>
             <span className="flex items-center gap-1 text-[#D4AF37]">
               <Sparkles className="h-3 w-3 fill-[#D4AF37]" /> 10M+ Combined Views
             </span>
@@ -115,7 +171,7 @@ export function ListenBeforeCome({ language }: ListenBeforeComeProps) {
             </div>
           </div>
 
-          {/* Official Website Link as requested */}
+          {/* Official Website Link */}
           <div className="pt-2 text-center sm:text-left text-xs font-sans text-[#FDF6EC]/65">
             Visit official website:{" "}
             <a
@@ -129,7 +185,6 @@ export function ListenBeforeCome({ language }: ListenBeforeComeProps) {
           </div>
 
         </div>
-
       </div>
     </section>
   );
