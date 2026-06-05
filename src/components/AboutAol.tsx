@@ -19,46 +19,15 @@ export function AboutAol({ language }: AboutAolProps) {
     >
       <div className="max-w-4xl mx-auto text-center space-y-8">
         
-        {/* Draw a gorgeous custom Vector Logo of Art of Living */}
-        <div className="flex justify-center select-none">
-          <div className="relative h-20 w-20 flex items-center justify-center bg-gradient-to-br from-[#FF6B35]/10 to-[#D4AF37]/10 rounded-full border border-[#D4AF37]/35 shadow-xl animate-float">
-            
-            {/* The beautiful Art of Living style lotus logo drawn in SVGs */}
-            <svg
-              className="h-12 w-12 text-[#D4AF37]"
-              viewBox="0 0 100 100"
-              fill="currentColor"
-            >
-              {/* Outer rays */}
-              <circle cx="50" cy="40" r="3" fill="#D4AF37" />
-              {/* Central rising sun rays */}
-              <path
-                d="M 50 15 A 35 35 0 0 1 85 50 L 15 50 Z"
-                fill="none"
-                stroke="#D4AF37"
-                strokeWidth="1.5"
-                opacity="0.45"
-              />
-              {/* Lotus Petals */}
-              <path
-                d="M 50 25 C 40 45, 10 50, 20 75 C 35 75, 45 65, 50 50 C 55 65, 65 75, 80 75 C 90 50, 60 45, 50 25 Z"
-                fill="#FF6B35"
-                opacity="0.9"
-              />
-              <path
-                d="M 50 40 C 44 55, 25 58, 30 75 C 40 75, 46 68, 50 60 C 54 68, 60 75, 70 75 C 75 58, 56 55, 50 40 Z"
-                fill="#D4AF37"
-                opacity="1"
-              />
-              {/* Swan base silhouette drawn elegantly */}
-              <path
-                d="M 25 80 C 35 80, 40 76, 50 82 C 60 76, 65 80, 75 80"
-                fill="none"
-                stroke="#D4AF37"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-              />
-            </svg>
+        {/* Official Art of Living Logo */}
+        <div className="flex justify-center select-none animate-float">
+          <div className="rounded-2xl bg-white px-8 py-4 shadow-2xl shadow-[#D4AF37]/20 border border-[#D4AF37]/30">
+            <img
+              src="/art-of-living-logo.svg"
+              alt="Art of Living Foundation"
+              className="h-14 w-auto object-contain"
+              loading="lazy"
+            />
           </div>
         </div>
 

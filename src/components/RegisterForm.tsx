@@ -316,9 +316,12 @@ export function RegisterForm({
                 {/* Ticket Header */}
                 <div className="flex justify-between items-start border-b border-white/10 pb-4 mb-4">
                   <div>
-                    <span className="text-[9px] font-bold tracking-widest text-[#FF6B35] uppercase">
-                      Art of Living Satsang
-                    </span>
+                    <img
+                      src="/art-of-living-logo.svg"
+                      alt="Art of Living"
+                      className="h-5 w-auto object-contain"
+                      style={{filter: "brightness(0) invert(1)"}}
+                    />
                     <h4 className="font-serif text-xl font-bold text-[#FDF6EC] uppercase tracking-wide">
                       {getPassCityName()} Pass
                     </h4>

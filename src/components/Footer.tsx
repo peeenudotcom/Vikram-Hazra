@@ -41,10 +41,18 @@ export function Footer({ language, onChangeLanguage }: FooterProps) {
           
           {/* Logo & Slogan Column */}
           <div className="space-y-4">
+            {/* Official Art of Living Logo */}
+            <div className="inline-block rounded-xl bg-white px-4 py-2 shadow-lg shadow-[#D4AF37]/10">
+              <img
+                src="/art-of-living-logo.svg"
+                alt="Art of Living Foundation"
+                className="h-8 w-auto object-contain"
+                loading="lazy"
+              />
+            </div>
             <div className="flex items-center gap-2">
-              <span className="text-xl animate-diya select-none">🕯️</span>
-              <h4 className="font-serif text-lg font-bold text-[#FDF6EC] tracking-wide">
-                Vikram Hazra Tour 2026
+              <h4 className="font-serif text-base font-bold text-[#FDF6EC] tracking-wide">
+                Vikram Hazra Punjab Tour 2026
               </h4>
             </div>
             
